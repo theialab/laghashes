@@ -1,0 +1,5 @@
+resources/synth_results/*/ingp/
+resources/synth_results/*/ours/
+resources/synth_results/*/pcd/
+make_video.sh
+*.py

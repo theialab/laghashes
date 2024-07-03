@@ -1,0 +1,296 @@
+<link rel="stylesheet" type="text/css" href="./resources/style.css" media="screen" />
+<link rel="stylesheet" href="resources/dics.original.css">
+
+<html lang="en">
+
+<head>
+    <title>
+        Lagrangian Hashing for Compressed Neural Field Representations 
+    </title>
+    <meta property="og:title"
+        content="Lagrangian Hashing for Compressed Neural Field Representations" />
+  	<meta property="og:description" content="
+    A memory efficient hybrid representation that is simultaneously Eulerian(grids) and Lagrangian(points), which realizes memory-efficient novel view synthesis." />
+    <meta property="twitter:card"          content="summary" />
+    <meta property="twitter:title"         content="Lagrangian Hashing for Compressed Neural Field Representations" />
+    <meta property="twitter:description"   content="A memory efficient hybrid representation that is simultaneously Eulerian(grids) and Lagrangian(points), which realizes memory-efficient novel view synthesis." />
+    <!-- <meta property="twitter:image"         content="./resources/kitti360_quali_dense/output_stacked_all_compressed.mp4" /> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            text-align: center;
+            background-color: #f0f0f0; /* Optional: Set a background color for better visibility */
+        }
+        .larger-arrow {
+            font-size: 2.0em; /* Adjust the font size as needed */
+            letter-spacing: 4.0em; /* Adjust the letter spacing as needed */
+            display: inline-block; /* Ensures text-align works */
+        }
+    </style> 
+    <script src="resources/js/video_comparison.js"></script>    
+    <script src="resources/js/dics.original.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="title">
+            Lagrangian Hashing for Compressed Neural Field Representations
+        </div>
+
+        <div class="venue">
+            <span class="author-block">
+                <a href="https://shrisudhan.github.io">Shrisudhan Govindarajan*</a><sup>1</sup>,</span>
+            <span class="author-block">
+                <a href="https://zenos4mbu.github.io/">Zeno Sambugaro*</a><sup>2</sup>,</span>
+            <span class="author-block">
+                <a href="https://ahanio.github.io">Ahan Shabanov</a><sup>1</sup>,</span>
+            <br>
+            <span class="author-block">
+                <a href="https://tovacinni.github.io/">Towaki Takikawa</a><sup>3</sup>,
+            <span class="author-block">
+                <a href="http://drebain.com">Daniel Rebain</a><sup>4</sup>,
+            <span class="author-block">
+                <a href="https://wsunid.github.io/">Weiwei Sun</a><sup>4</sup>
+            <span class="author-block">
+                <a href="https://webapps.unitn.it/du/en/Persona/PER0003698/Curriculum">Nicola Conci</a><sup>2</sup>,
+            <br>
+            <span class="author-block">
+                <a href="https://www.cs.ubc.ca/~kmyi/">Kwang Moo Yi</a><sup>4</sup>,
+            <span class="author-block">
+                <a href="https://taiya.github.io">Andrea Tagliasacchi</a><sup>1,3,5</sup>
+            </span>
+
+        </div>
+
+        <div class="is-size-4 publication-authors">
+          <span class="author-block"><sup>1</sup>Simon Fraser University,</span>
+          <span class="author-block"><sup>2</sup>University of Trento</span>
+          <span class="author-block"><sup>3</sup>University of Toronto</span>
+          <br>
+          <span class="author-block"><sup>4</sup>University of British Columbia</span>
+          <span class="author-block"><sup>5</sup>Google DeepMind</span>
+        </div>
+
+        <br><br>
+
+        <!-- <br>
+        <div class="links"><a href="resources/paper.pdf">[Paper]</a></div>
+        <div class="links"><a href="">[Code]</a></div>
+        <br><br> -->
+
+        <hr>
+        <br>
+        <p style="width: 80%;">
+            <b>TL;DR:</b>
+            A memory efficient hybrid representation that is simultaneously Eulerian(grids) and Lagrangian(points), which realizes memory-efficient novel view synthesis.
+        </p>
+        <br> 
+        <img style="width: 80%;" src="resources/teaser.png" alt="Teaser figure" />
+        <br> 
+        <hr>
+        
+        <h1>Abstract</h1>
+        <p style="width: 80%;text-align: justify;">
+            We present Lagrangian Hashing, a representation for neural fields combining the characteristics of fast training NeRF methods that rely on Eulerian grids (i.e.~InstantNGP), with those that employ points equipped with features as a way to represent information (e.g. 3D Gaussian Splatting or PointNeRF). 
+            We achieve this by incorporating a point-based representation into the high-resolution layers of the hierarchical hash tables of an InstantNGP representation. 
+            As our points are equipped with a field of influence, our representation can be interpreted as a mixture of Gaussians stored within the hash table. 
+            We propose a loss that encourages the movement of our Gaussians towards regions that require more representation budget to be sufficiently well represented. 
+            Our main finding is that our representation allows the reconstruction of signals using a more compact representation without compromising quality.
+        </p>
+        <br>    
+        <hr>
+        
+        <h1>Method</h1>
+        <img style="width: 80%;" src="resources/overview.png" alt="Method Overview" />
+        <br><br>
+        <p style="width: 80%;text-align: justify;">
+        <b>Overview</b>: <em>(1) Hashing of voxel vertices:</em> For any given input coordinate \(x_i\), our method identifies surrounding voxels across \(L\) Levels of detail (LoDs) (Only one Lod is showed for convenience). 
+            Indices are then assigned to the vertices of these voxels, through hashing procedure. 
+            <em>(2) Lookup to buckets:</em> for all resulting corner indices, we look up the corresponding \(B\) buckets, containing \(K\) feature vector and their corresponding \(\mu_{k}\) position.
+            <em>(3) Gaussian interpolation:</em> We compute Gaussian weights with respect to the input position for every feature vector in the bucket. 
+            <em>(4) Feature aggregation:</em> We multiply the Gaussian weights for the feature corresponding to the feature vector and aggregate them from every level of detail. 
+            <em>(5) Neural Network:</em> the resulting concatenated features are mapped to the input domain by the Neural Network.
+        </p>
+        <br>
+        <hr>
+        
+        <h1>Pareto plot: PSNR vs # params</h1>
+        <img style="width: 80%;" src="resources/pareto_plot.png" alt="Pareto plot" />
+        <br><br>
+        <p style="width: 80%;text-align: justify;">
+        <b>Pareto plot</b>: Tanks and temples(left), Gigapixel images(right). We demonstrate
+        that our method consistently outperforms InstantNGP in terms of quality vs number
+        of parameters.
+        </p>
+        <br>
+        <hr>
+
+        <h1> Comparisons(Ours <font color="red">vs</font> InstantNGP) </h1>
+        <p style="width: 80%; text-align: justify;">
+            We compare LagHash(ours) with baseline InstantNGP. We show that our method achieve competitive performance with baseline utilizing fewer parameters. 
+            <!-- Note that we can move <font color="blue"> slider left and right </font> to see the comparison.     -->
+        </p>
+        <br>
+       
+        <table class="tbl_video">
+            <tr>
+                <td colspan="3" style="background-color: #85b2df; font-size: 20px;">
+                   Results on NeRF synthetic dataset.  
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <video class="kitti360" id="00" width="100%" preload="auto" playsinline webkit-playsinline loop autoplay muted>
+                        <source src="resources/synth_results/lego/output_stacked.mp4" type="video/mp4">
+                    </video>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <video class="kitti360" id="01" width="100%" preload="auto" playsinline webkit-playsinline loop autoplay muted>
+                        <source src="resources/synth_results/drums/output_stacked.mp4" type="video/mp4">
+                    </video>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <video class="kitti360" id="02" width="100%" preload="auto" playsinline webkit-playsinline loop autoplay muted>
+                        <source src="resources/synth_results/hotdog/output_stacked.mp4" type="video/mp4">
+                    </video>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <video class="kitti360" id="03" width="100%" preload="auto" playsinline webkit-playsinline loop autoplay muted>
+                        <source src="resources/synth_results/ship/output_stacked.mp4" type="video/mp4">
+                    </video>
+                </td>
+            </tr>
+            <tr>
+                <td width=33.33% style="font-size: 18px;"> Lagrangian rep(final LoD) </td>
+                <td width=33.33% style="font-size: 18px;"> LagHash (Ours) </td>
+                <td width=33.33% style="font-size: 18px;"> InstantNGP </td>
+            </tr>
+            <tr>
+                <td width=33.33% style="font-size: 18px;"></td>
+                <td width=33.33% style="font-size: 18px;"> 6.68M params </td>
+                <td width=33.33% style="font-size: 18px;"> 12.10M params </td>
+            </tr>
+        </table>
+        <br> 
+        <br> 
+        <hr>
+
+        <h1> Lagrangian representation </h1>
+        <p style="width: 80%; text-align: justify;">
+            We present interactive visualizations of point clouds used in the paper. 
+            Use mouse to rotate the point cloud: scroll to zoom in/zoom-out, 
+            Shift+Left Mouse Button to move the camera, Left Mouse Button to rotate 
+            the camera.
+        </p>
+        <br/>
+
+        <table class="tbl_video" style="width: 80%;">
+        <tr>
+            <td colspan="2" style="background-color: #85b2df; font-size: 20px;">
+                            Tanks & Temples lagrangian representation.  
+            </td>
+        </tr><tr>   
+            <td style="width: 50%; padding: 0;">
+                <model-viewer alt="CAM row 1"
+                    shadow-intensity="1" 
+                    camera-controls
+                    touch-action="pan-y"
+                    camera-orbit="45deg 45deg 20mm"
+                    auto-rotate tone-mapping="commerce"
+                    src="resources/interactive_pcd/caterpillar.glb"
+                    style="width: 100%; height: 500px; margin: 0;">
+                </model-viewer>
+            </td>
+            <td style="width: 50%; padding: 0;">
+                <model-viewer alt="CAM row 1"
+                    shadow-intensity="1" 
+                    camera-controls
+                    touch-action="pan-y"
+                    camera-orbit="45deg 45deg 20mm"
+                    auto-rotate tone-mapping="commerce"
+                    src="resources/interactive_pcd/truck.glb"
+                    style="width: 100%; height: 500px; margin: 0;">
+                </model-viewer>
+            </td>
+        </tr>
+        <tr>
+            <td width=50.00% style="font-size: 18px;"> Caterpillar </td>
+            <td width=50.00% style="font-size: 18px;"> Truck </td>
+        </tr>
+        </table>
+
+        <table class="tbl_video">
+            <tr>
+                <td colspan="3" style="background-color: #85b2df; font-size: 20px;">
+                   Multi-scale lagrangian representation.  
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <video class="kitti360" id="03" width="100%" preload="auto" playsinline webkit-playsinline loop autoplay muted>
+                        <source src="resources/pcd_results/ship/output_stacked.mp4" type="video/mp4">
+                    </video>
+                </td>
+            </tr>
+            <tr>
+                <td width=33.33% style="font-size: 18px;"> Lagrangian rep(pre-final LoD)</td>
+                <td width=33.33% style="font-size: 18px;"> Lagrangian rep(final LoD)</td>
+                <td width=33.33% style="font-size: 18px;"> LagHash (Ours)</td>
+            </tr>
+        </table>
+        <br> 
+        <br> 
+
+        <hr>
+        <h1>Acknowledgements</h1> 
+            <p style="width: 80%;text-align: justify;">
+            This template was originally made by <a href="http://web.mit.edu/phillipi/">Phillip Isola</a> and <a href="http://richzhang.github.io/">Richard Zhang</a> for a <a href="http://richzhang.github.io/colorization/">colorful project</a>, and inherits the modifications made by <a href="https://github.com/elliottwu/webpage-template">Shangzhe Wu</a> 
+            and  <a href="https://github.com/canonical-capsules/canonical-capsules.github.io">Canonical Capsules</a>.
+
+            <!-- Video comparison is adapted from <a href="https://jonbarron.info/zipnerf">ZipNeRF</a>.  -->
+            <!-- Image slider script is adapted from  <a href="https://github.com/abelcabezaroman/definitive-image-comparison-slider">Dics</a>.  -->
+            <!-- The code can be found <a href="https://github.com/pointnerfpp/pointnerfpp.github.io">here</a>. -->
+            </p>
+
+    <br><br>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get all video elements with the class 'myVideo'
+            var videos = document.querySelectorAll('.kitti360');
+    
+            // Set the playback rate for each video
+            videos.forEach(function(video) {
+                video.playbackRate = 0.3; // Adjust the playback rate as needed
+            });
+
+            new Dics({
+                container: document.querySelectorAll('.b-dics')[0],
+                hideTexts: false,
+                textPosition: "bottom",
+                // linesColor: 'rgb(0,0,0)'
+            });
+            new Dics({
+                container: document.querySelectorAll('.b-dics')[1],
+                hideTexts: false,
+                textPosition: "bottom"
+            });
+        });
+        initComparisons();
+    </script>
+    <br><br><br>
+
+</body>
+
+</html>
