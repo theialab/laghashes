@@ -54,7 +54,7 @@
             <span class="author-block">
                 <a href="http://drebain.com">Daniel Rebain</a><sup>4</sup>,
             <span class="author-block">
-                <a href="https://wsunid.github.io/">Weiwei Sun</a><sup>4</sup>
+                <a href="https://wsunid.github.io/">Weiwei Sun</a><sup>4</sup>,
             <span class="author-block">
                 <a href="https://webapps.unitn.it/du/en/Persona/PER0003698/Curriculum">Nicola Conci</a><sup>2</sup>,
             <br>
@@ -68,10 +68,10 @@
 
         <div class="is-size-4 publication-authors">
           <span class="author-block"><sup>1</sup>Simon Fraser University,</span>
-          <span class="author-block"><sup>2</sup>University of Trento</span>
-          <span class="author-block"><sup>3</sup>University of Toronto</span>
+          <span class="author-block"><sup>2</sup>University of Trento,</span>
+          <span class="author-block"><sup>3</sup>University of Toronto,</span>
           <br>
-          <span class="author-block"><sup>4</sup>University of British Columbia</span>
+          <span class="author-block"><sup>4</sup>University of British Columbia,</span>
           <span class="author-block"><sup>5</sup>Google DeepMind</span>
         </div>
 
@@ -79,8 +79,8 @@
 
         <br>
         <div class="links"><a href="resources/paper.pdf">[Paper]</a></div>
-        <div class="links"><a href="">[Arxiv(soon)]</a></div>
-        <div class="links"><a href="">[Code(soon)]</a></div>
+        <div class="links"><a href="https://arxiv.org/abs/2409.05334">[Arxiv]</a></div>
+        <div class="links"><a href="">[Code(15/09)]</a></div>
         <br><br>
 
         <hr>
@@ -203,10 +203,12 @@
         </tr><tr>   
             <td style="width: 50%; padding: 0;">
                 <model-viewer alt="CAM row 1"
-                    shadow-intensity="1" 
+                    shadow-intensity="0" 
                     camera-controls
                     touch-action="pan-y"
-                    camera-orbit="45deg 45deg 20mm"
+                    camera-orbit="45deg 60deg 20mm"
+                    camera-target="0.5m 0m 0m"
+                    field-of-view="30deg" 
                     auto-rotate tone-mapping="commerce"
                     src="resources/interactive_pcd/caterpillar.glb"
                     style="width: 100%; height: 500px; margin: 0;">
@@ -214,10 +216,12 @@
             </td>
             <td style="width: 50%; padding: 0;">
                 <model-viewer alt="CAM row 1"
-                    shadow-intensity="1" 
+                    shadow-intensity="0" 
                     camera-controls
                     touch-action="pan-y"
-                    camera-orbit="45deg 45deg 20mm"
+                    camera-orbit="45deg 60deg 20mm"
+                    camera-target="0.4m 0m 0m"
+                    field-of-view="50deg" 
                     auto-rotate tone-mapping="commerce"
                     src="resources/interactive_pcd/truck.glb"
                     style="width: 100%; height: 500px; margin: 0;">
