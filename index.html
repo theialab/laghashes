@@ -85,10 +85,11 @@
         <br><br>
 
         <br>
-        <div style="display: flex; justify-content: center; align-items: center; gap: 2px;">
+        <div style="display: flex; justify-content: center; align-items: center; gap: 2px; width: 500px; margin: 0 auto;">
             <div class="links"><a href="resources/paper.pdf">[Paper]</a></div>
             <div class="links"><a href="https://arxiv.org/abs/2409.05334">[Arxiv]</a></div>
             <div class="links"><a href="https://github.com/theialab/lagrangian_hashes">[Code]</a></div>
+            <div class="links"><a href="resources/poster.pdf">[Poster]</a></div>
         </div>
         <br><br>
 
@@ -101,15 +102,10 @@
             which realizes memory-efficient novel view synthesis.
         </p>
         <br>
-        <video class="kitti360" id="myVideo" width="80%" preload="auto" playsinline webkit-playsinline loop autoplay
+        <video id="myVideo" width="80%" preload="auto" playsinline webkit-playsinline loop autoplay
             muted>
             <source src="resources/teaser_stacked.mp4" type="video/mp4">
         </video>
-
-        <script>
-            // Change playback rate to 2x (speed up video)
-            document.getElementById("myVideo").playbackRate = 3.0;  // 2.0 means double speed
-        </script>
         <br>
         <hr>
 
@@ -321,7 +317,7 @@
 
             // Set the playback rate for each video
             videos.forEach(function (video) {
-                video.playbackRate = 0.3; // Adjust the playback rate as needed
+                video.playbackRate = 0.5; // Adjust the playback rate as needed
             });
 
             new Dics({
